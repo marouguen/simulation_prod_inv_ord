@@ -5,6 +5,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Simulation Results</title>
     <link rel="stylesheet" href="/static/css/styles.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 20px;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1,
+      h2 {
+        text-align: center;
+        color: #444;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      table th,
+      table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+      }
+      table th {
+        background-color: #007bff;
+        color: white;
+      }
+      ul {
+        list-style: none;
+        padding: 0;
+      }
+      ul li {
+        padding: 5px 0;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
@@ -15,51 +59,24 @@
         <thead>
           <tr>
             <th>Machine</th>
-            <th>Production</th>
-            <th>Material Consumed</th>
-            <th>Employees Needed</th>
-            <th>Average Lead Time (hours)</th>
-            <th>Used Capacity (%)</th>
-            <th>Downtime Rate (%)</th>
+            <th>Used Capacity</th>
+            <th>Actual Production</th>
             <th>Scrap Rate (%)</th>
+            <th>Downtime Rate (%)</th>
           </tr>
         </thead>
         <tbody>
           {% for machine in machines %}
           <tr>
             <td>{{ machine.machine }}</td>
-            <td>{{ machine.production }}</td>
-            <td>{{ machine.material_consumed }}</td>
-            <td>{{ machine.employees_needed }}</td>
-            <td>{{ machine.average_lead_time }}</td>
             <td>{{ machine.used_capacity }}</td>
-            <td>{{ machine.downtime_rate }}</td>
+            <td>{{ machine.production }}</td>
             <td>{{ machine.scrap_rate }}</td>
+            <td>{{ machine.downtime_rate }}</td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
-
-      <h2>Inventory Metrics</h2>
-      <table>
-        <thead>
-          <tr>
-            <th>Material</th>
-            <th>Initial Level</th>
-            <th>Final Level</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for inventory in inventory %}
-          <tr>
-            <td>{{ inventory.material }}</td>
-            <td>{{ inventory.initial_level }}</td>
-            <td>{{ inventory.final_level }}</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      <p><strong>Number of Stockouts:</strong> {{ stockouts }}</p>
 
       <h2>Orders Metrics</h2>
       <table>
@@ -68,8 +85,8 @@
             <th>Order ID</th>
             <th>Status</th>
             <th>Completed Quantity</th>
-            <th>Lead Time (hours)</th>
-            <th>On Time</th>
+            <th>Due Date</th>
+            <th>Lead Time</th>
           </tr>
         </thead>
         <tbody>
@@ -78,8 +95,37 @@
             <td>{{ order.order_id }}</td>
             <td>{{ order.status }}</td>
             <td>{{ order.completed_quantity }}</td>
+            <td>{{ order.due_date }}</td>
             <td>{{ order.lead_time }}</td>
-            <td>{{ order.on_time }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <h2>Inventory Metrics</h2>
+      <h2>Inventory Metrics</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th>Initial Level</th>
+            <th>Consumed</th>
+            <th>Reorder Quantity</th>
+            <th>Final Level</th>
+            <th>Stockouts</th>
+            <th>Reorder Triggered</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for material, metrics in inventory.items() %}
+          <tr>
+            <td>{{ material }}</td>
+            <td>{{ metrics.initial }}</td>
+            <td>{{ metrics.consumed }}</td>
+            <td>{{ metrics.reorder_quantity }}</td>
+            <td>{{ metrics.final }}</td>
+            <td>{{ metrics.stockouts }}</td>
+            <td>{{ metrics.reorder_triggered }}</td>
           </tr>
           {% endfor %}
         </tbody>
