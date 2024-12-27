@@ -71,6 +71,7 @@ def simulate(plans=None):
     inventory_status = {}
     machine_results = []
     orders_results = []
+    total_time = 0  # Cumulative processing time
 
     for index, row in inventory_data.iterrows():
         total_consumption[row["material_name"]] = 0
@@ -83,7 +84,7 @@ def simulate(plans=None):
         scrap_rate = machine_params["scrap"] / 100
         downtime_rate = machine_params["downtime"] / 100
         material_needed = machine_params["material_kg_unit"]
-        employees_needed = machine_params["employees_needed_shift"]
+        employees_needed = machine_params["employees_needed"]
 
         if plan["employees_available"] < employees_needed:
             machine_results.append({
@@ -97,7 +98,7 @@ def simulate(plans=None):
             })
             continue
 
-        potential_production =  production_rate
+        potential_production = hours_available * production_rate
         actual_production = potential_production * (1 - scrap_rate)
         material_used = actual_production * material_needed
 
@@ -106,7 +107,7 @@ def simulate(plans=None):
         machine_results.append({
             "machine": plan["name"],
             "status": "Simulated",
-            "production": potential_production,
+            "production": actual_production,
             "material_consumed": material_used,
             "used_capacity": (actual_production / potential_production) * 100,
             "downtime_rate": downtime_rate,
@@ -117,35 +118,71 @@ def simulate(plans=None):
         row = inventory_data[inventory_data["material_name"] == material].iloc[0]
         initial_level = row["initial_level_kg"]
         reorder_quantity = row["reorder_quantity_kg"]
+        reorder_triggered = "Yes" if consumed > initial_level else "No"  # Determine if reorder occurred
+        shortage_quantity = consumed - initial_level if consumed > initial_level else 0
         if consumed > initial_level:
             stockouts[material] += 1
-            final_level = initial_level - consumed + reorder_quantity
+            final_level = reorder_quantity + initial_level
+            shortage_quantity = consumed - initial_level 
         else:
             final_level = initial_level - consumed
+            shortage_quantity = 0
         inventory_status[material] = {
             "initial": initial_level,
             "consumed": consumed,
             "reorder_quantity": reorder_quantity if final_level > initial_level else 0,
             "final": final_level,
             "stockouts": stockouts[material],
+            "reorder_triggered": reorder_triggered,
+            "shortage_quantity": shortage_quantity
         }
 
-    for index, order in orders_data.iterrows():
+    
+    # Calculate order due dates
+    orders_data["due_date"] = orders_data.apply(
+        lambda row: parse_datetime(row["entry_date"]) + timedelta(hours=row["agreed_lead_time"]), axis=1
+    )
+    orders_data["processing_time"] = orders_data["order_size"] / machines_data.set_index("name").loc[
+        orders_data["machine_name"], "rate_kg_h"
+    ].values
+
+    # Sort orders by priority
+    sorted_orders = orders_data.sort_values(by=["due_date", "processing_time"]).to_dict(orient="records")
+
+    for order in sorted_orders:
         entry_date = parse_datetime(order["entry_date"])
         due_date = entry_date + timedelta(hours=order["agreed_lead_time"])
-        order_size = order["order_size"]
-        material_name = order["material_name"]
+        processing_time = order["order_size"] / machines_data.set_index("name").loc[order["machine_name"], "rate_kg_h"]
+        wait_time = total_time
+        lead_time = wait_time + processing_time
 
-        completed_quantity = min(order_size, total_consumption.get(material_name, 0))
-        total_consumption[material_name] -= completed_quantity
+        # Check inventory for material availability
+        material_needed = machines_data.set_index("name").loc[order["machine_name"], "material_kg_unit"] * order["order_size"]
+        material_available = inventory_data.set_index("material_name").loc[order["material_name"], "material_quantity"]
+
+        if material_available >= material_needed:
+            completed_quantity = order["order_size"]
+            inventory_data.loc[inventory_data["material_name"] == order["material_name"], "material_quantity"] -= material_needed
+            status = "Completed"
+            shortage_quantity = 0
+        else:
+            completed_quantity = material_available / machines_data.set_index("name").loc[order["machine_name"], "material_kg_unit"]
+            inventory_data.loc[inventory_data["material_name"] == order["material_name"], "material_quantity"] = 0
+            status = "Partial" if completed_quantity > 0 else "Not Completed"
+            shortage_quantity = order["order_size"] - completed_quantity
+
+        total_time += processing_time
+        on_time = "Yes" if lead_time <= order["agreed_lead_time"] else "No"
 
         orders_results.append({
             "order_id": order["order_id"],
-            "status": "Completed" if completed_quantity == order_size else "Pending",
+            "status": status,
             "completed_quantity": completed_quantity,
-            "entry_date": entry_date.strftime("%Y-%m-%d %H:%M"),
+            "shortage_quantity": shortage_quantity,
             "due_date": due_date.strftime("%Y-%m-%d %H:%M"),
-            "on_time": "Yes" if completed_quantity == order_size else "No",
+            "entry_date": entry_date.strftime("%Y-%m-%d %H:%M"),
+            "on_time": on_time,
+            "lead_time": lead_time,
         })
 
     return render_template(
