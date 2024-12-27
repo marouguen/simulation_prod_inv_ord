@@ -1,0 +1,6 @@
+order_id,machine_name,material_name,order_size,entry_date,agreed_lead_time
+1,Prensa 1,Aluminium,300,2024-12-26T08:00,48
+2,Vertical,Powder Coating,500,2024-12-26T10:00,72
+3,Horizontal,Powder Coating,200,2024-12-27T09:00,24
+4,Prensa 1,Aluminium,150,2024-12-28T08:00,36
+5,Vertical,Powder Coating,400,2024-12-28T12:00,60

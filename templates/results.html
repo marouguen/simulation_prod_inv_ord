@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simulation Results</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Simulation Results</h1>
+
+      <h2>Machine Metrics</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Machine</th>
+            <th>Production</th>
+            <th>Material Consumed</th>
+            <th>Employees Needed</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for machine in machines %}
+          <tr>
+            <td>{{ machine.machine }}</td>
+            <td>{{ machine.production }}</td>
+            <td>{{ machine.material_consumed }}</td>
+            <td>{{ machine.employees_needed }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <h2>Inventory Metrics</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th>Initial Level</th>
+            <th>Final Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for inventory in inventory %}
+          <tr>
+            <td>{{ inventory.material }}</td>
+            <td>{{ inventory.initial_level }}</td>
+            <td>{{ inventory.final_level }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <h2>Orders Metrics</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Order ID</th>
+            <th>Status</th>
+            <th>Completed Quantity</th>
+            <th>On Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+          <tr>
+            <td>{{ order.order_id }}</td>
+            <td>{{ order.status }}</td>
+            <td>{{ order.completed_quantity }}</td>
+            <td>{{ order.on_time }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

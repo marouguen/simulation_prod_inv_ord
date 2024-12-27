@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simulation Input</title>
+    <link rel="stylesheet" href="/static/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Simulation Input</h1>
+      <form action="/" method="POST" enctype="multipart/form-data">
+        <h3>Machine-Specific Planning</h3>
+        {% for machine in machines_data %}
+        <div class="machine-plan">
+          <h4>{{ machine.name }}</h4>
+          <label for="{{ machine.name }}_start_datetime"
+            >Start Date and Time:</label
+          >
+          <input
+            type="datetime-local"
+            id="{{ machine.name }}_start_datetime"
+            name="{{ machine.name }}_start_datetime"
+            required
+          />
+
+          <label for="{{ machine.name }}_employees_available"
+            >Employees Available:</label
+          >
+          <input
+            type="number"
+            id="{{ machine.name }}_employees_available"
+            name="{{ machine.name }}_employees_available"
+            required
+          />
+
+          <label for="{{ machine.name }}_shifts_per_day">Shifts per Day:</label>
+          <input
+            type="number"
+            id="{{ machine.name }}_shifts_per_day"
+            name="{{ machine.name }}_shifts_per_day"
+            required
+          />
+
+          <label for="{{ machine.name }}_hours_per_shift"
+            >Hours per Shift:</label
+          >
+          <input
+            type="number"
+            id="{{ machine.name }}_hours_per_shift"
+            name="{{ machine.name }}_hours_per_shift"
+            required
+          />
+        </div>
+        {% endfor %}
+
+        <h3>File Uploads</h3>
+        <label for="inventory_file">Upload Inventory File:</label>
+        <input type="file" id="inventory_file" name="inventory_file" />
+
+        <label for="orders_file">Upload Orders File:</label>
+        <input type="file" id="orders_file" name="orders_file" />
+
+        <button type="submit">Simulate</button>
+      </form>
+    </div>
+  </body>
+</html>
