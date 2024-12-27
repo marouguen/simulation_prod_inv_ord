@@ -18,6 +18,10 @@
             <th>Production</th>
             <th>Material Consumed</th>
             <th>Employees Needed</th>
+            <th>Average Lead Time (hours)</th>
+            <th>Used Capacity (%)</th>
+            <th>Downtime Rate (%)</th>
+            <th>Scrap Rate (%)</th>
           </tr>
         </thead>
         <tbody>
@@ -27,6 +31,10 @@
             <td>{{ machine.production }}</td>
             <td>{{ machine.material_consumed }}</td>
             <td>{{ machine.employees_needed }}</td>
+            <td>{{ machine.average_lead_time }}</td>
+            <td>{{ machine.used_capacity }}</td>
+            <td>{{ machine.downtime_rate }}</td>
+            <td>{{ machine.scrap_rate }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -51,6 +59,7 @@
           {% endfor %}
         </tbody>
       </table>
+      <p><strong>Number of Stockouts:</strong> {{ stockouts }}</p>
 
       <h2>Orders Metrics</h2>
       <table>
@@ -59,6 +68,7 @@
             <th>Order ID</th>
             <th>Status</th>
             <th>Completed Quantity</th>
+            <th>Lead Time (hours)</th>
             <th>On Time</th>
           </tr>
         </thead>
@@ -68,6 +78,7 @@
             <td>{{ order.order_id }}</td>
             <td>{{ order.status }}</td>
             <td>{{ order.completed_quantity }}</td>
+            <td>{{ order.lead_time }}</td>
             <td>{{ order.on_time }}</td>
           </tr>
           {% endfor %}

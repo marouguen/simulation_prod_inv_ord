@@ -1,4 +1,4 @@
-name,rate_kg_h,scrap,downtime,material_kg_unit,employees_needed
-Prensa 1,1000,0.15,0.10,3,7
-Vertical,1000,0.01,0.10,0.125,10
-Horizontal,500,0.02,0.15,0.15,6
+name,rate_kg_h,scrap,downtime,material_kg_unit,employees_needed_shift,material_name
+Prensa 1,1000,0.15,0.10,3,7,Aluminium
+Vertical,1000,0.01,0.10,0.125,10,Powder Coating
+Horizontal,500,0.02,0.15,0.15,6,Powder Coating
