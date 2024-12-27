@@ -81,8 +81,8 @@ def simulate(plans=None):
         machine_params = machines_data[machines_data["name"] == plan["name"]].iloc[0]
         hours_available = plan["shifts_per_day"] * plan["hours_per_shift"]
         production_rate = machine_params["rate_kg_h"]
-        scrap_rate = machine_params["scrap"] / 100
-        downtime_rate = machine_params["downtime"] / 100
+        scrap_rate = machine_params["scrap"]
+        downtime_rate = machine_params["downtime"]
         material_needed = machine_params["material_kg_unit"]
         employees_needed = machine_params["employees_needed"]
 
@@ -107,9 +107,9 @@ def simulate(plans=None):
         machine_results.append({
             "machine": plan["name"],
             "status": "Simulated",
-            "production": actual_production,
+            "production": round(actual_production,0),
             "material_consumed": material_used,
-            "used_capacity": (actual_production / potential_production) * 100,
+            "used_capacity": round((actual_production / potential_production),2),
             "downtime_rate": downtime_rate,
             "scrap_rate": scrap_rate,
         })
@@ -129,12 +129,12 @@ def simulate(plans=None):
             shortage_quantity = 0
         inventory_status[material] = {
             "initial": initial_level,
-            "consumed": consumed,
+            "consumed": round(consumed,0),
             "reorder_quantity": reorder_quantity if final_level > initial_level else 0,
             "final": final_level,
             "stockouts": stockouts[material],
             "reorder_triggered": reorder_triggered,
-            "shortage_quantity": shortage_quantity
+            "shortage_quantity": round(shortage_quantity,0)
         }
 
     
@@ -177,12 +177,12 @@ def simulate(plans=None):
         orders_results.append({
             "order_id": order["order_id"],
             "status": status,
-            "completed_quantity": completed_quantity,
+            "completed_quantity": round(completed_quantity,0),
             "shortage_quantity": shortage_quantity,
             "due_date": due_date.strftime("%Y-%m-%d %H:%M"),
             "entry_date": entry_date.strftime("%Y-%m-%d %H:%M"),
             "on_time": on_time,
-            "lead_time": lead_time,
+            "lead_time": round(lead_time,1)
         })
 
     return render_template(
